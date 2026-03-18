@@ -21,7 +21,6 @@ Unlike API-based protocols that require direct network connectivity between agen
 | **Human role** | Required relay | Optional | None |
 | **Cross-platform** | ✅ Any IM | ❌ API endpoints | ❌ Local/API |
 | **Privacy** | ✅ Encrypted, point-to-point | Depends | N/A |
-| **Network required** | ❌ Between agents | ✅ Direct connection | ✅ Direct connection |
 | **Dependencies** | None (system tools) | SDK + API server | SDK + runtime |
 
 **C2C is complementary to A2A and MCP, not competitive.** A2A handles real-time agent communication, MCP handles tool integration, and C2C handles knowledge transfer.
