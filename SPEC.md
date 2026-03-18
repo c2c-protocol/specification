@@ -85,6 +85,7 @@ Source AI          Knowledge Bottle        Human Relay         Target AI
 | **Relay** | The human who forwards the Note from sender to receiver |
 | **Package** | The encrypted archive containing the skill |
 | **Note** | The text message containing download instructions and credentials |
+| **Knowledge Bottle** | The distilled, encrypted package of an AI skill — the core transfer artifact in C2C |
 | **Temporary Storage** | A file hosting service used to store the encrypted package |
 
 ---
@@ -131,7 +132,7 @@ Sender Agent         Human Relay          Receiver Agent
 
 ## 5. Package Format
 
-### 10.1 Skill Packaging
+### 5.1 Skill Packaging
 
 A skill MUST be packaged as one of:
 
@@ -145,7 +146,7 @@ For directory packaging:
 tar czf <name>.tar.gz -C <skill-directory> .
 ```
 
-### 10.2 Encryption
+### 5.2 Encryption
 
 All packages MUST be encrypted before upload.
 
@@ -166,7 +167,7 @@ Decryption command:
 openssl enc -aes-256-cbc -d -pbkdf2 -in <file>.enc -out <file> -k <password>
 ```
 
-### 8.3 Password Generation
+### 5.3 Password Generation
 
 Passwords MUST be:
 - At least 24 characters long
@@ -182,7 +183,7 @@ openssl rand -base64 24
 
 ## 6. Temporary Storage
 
-### 10.1 Requirements
+### 6.1 Requirements
 
 The temporary storage service MUST:
 - Accept file uploads via HTTP
@@ -190,13 +191,13 @@ The temporary storage service MUST:
 - Automatically delete files after a defined period
 - Not require authentication for download
 
-### 10.2 Recommended Services
+### 6.2 Recommended Services
 
 | Service | Max Size | Expiry | Upload Method |
 |---|---|---|---|
 | litterbox.catbox.moe | 1 GB | 24h | `multipart/form-data` |
 
-### 8.3 Expiry
+### 6.3 Expiry
 
 Files SHOULD have a maximum lifetime of **24 hours**. The Note MUST inform the receiver of the expiry window.
 
@@ -206,7 +207,7 @@ Files SHOULD have a maximum lifetime of **24 hours**. The Note MUST inform the r
 
 The Note is the core transfer artifact. It MUST be plain text, readable by both humans and AI agents.
 
-### 10.1 Structure
+### 7.1 Structure
 
 A Note MUST contain two clearly separated sections:
 
@@ -230,7 +231,7 @@ A Note MUST contain two clearly separated sections:
 - Cleanup command (rm)
 ```
 
-### 10.2 Requirements
+### 7.2 Requirements
 
 - The Note MUST be self-contained (no external references needed except the download URL)
 - The Note MUST include the decryption password
@@ -238,7 +239,7 @@ A Note MUST contain two clearly separated sections:
 - The Note MUST use only standard shell commands available on all Unix-like systems
 - The human relay SHOULD be able to forward the entire Note without modification
 
-### 8.3 Section Markers
+### 7.3 Section Markers
 
 The two sections MUST be clearly delimited so that:
 - The human relay knows which part is for them (summary/instructions)
@@ -254,14 +255,14 @@ Recommended markers:
 
 ## 8. Security Model
 
-### 10.1 Threat Model
+### 8.1 Threat Model
 
 C2C assumes:
 - The communication channel between agents is **untrusted** (any IM platform)
 - The temporary storage is **untrusted** (public file hosting)
 - The human relay is **trusted** (the admin controls what gets forwarded)
 
-### 10.2 Security Properties
+### 8.2 Security Properties
 
 | Property | Mechanism |
 |---|---|
@@ -297,13 +298,13 @@ C2C implementations use shell commands that security scanners may flag:
 
 ## 9. Transport Requirements
 
-### 10.1 Minimum Requirements
+### 9.1 Minimum Requirements
 
 A C2C-compatible transport channel MUST support:
 - Text messages of at least 2,000 characters
 - Copy-paste or message forwarding
 
-### 10.2 Compatible Transports
+### 9.2 Compatible Transports
 
 Any text-capable channel works:
 
