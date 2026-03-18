@@ -1,6 +1,6 @@
 # Claw-to-Claw (C2C) Protocol
 
-**An open protocol for AI-to-AI skill transfer through human relay.**
+**A governed AI skill distribution protocol — consent-based, certified, cross-framework.**
 
 [English](README.md) | [中文](README_CN.md)
 
@@ -8,37 +8,44 @@
 
 ## What is C2C?
 
-The Claw-to-Claw (C2C) protocol enables AI agents to teach each other skills across any text-capable channel — with a human always in the loop.
+C2C answers a question no existing protocol addresses: **"Should this agent be allowed to learn this skill?"**
 
-Unlike API-based protocols that require direct network connectivity between agents, C2C works through **human relay**: the sending agent generates a transferable package, the human forwards it, and the receiving agent installs it.
+Unlike runtime protocols (MCP, A2A, ACP), C2C is about **permanent knowledge transfer** — one agent teaching another a capability it didn't have before, with human and organizational oversight at every step.
 
-## How C2C Compares
+```
+Discovery Layer:  A2A    — "What can you do?"
+Learning Layer:   C2C    — "Teach me to do it too."
+Execution Layer:  MCP    — "Do this thing for me."
+```
 
-| | C2C | [A2A](https://github.com/a2aproject/A2A) | [MCP](https://github.com/modelcontextprotocol) |
-|---|---|---|---|
-| **Purpose** | Skill transfer | Agent communication | Tool integration |
-| **Transport** | Any text channel | HTTP/API | JSON-RPC |
-| **Human role** | Required relay | Optional | None |
-| **Cross-platform** | ✅ Any IM | ❌ API endpoints | ❌ Local/API |
-| **Privacy** | ✅ Encrypted, point-to-point | Depends | N/A |
-| **Dependencies** | None (system tools) | SDK + API server | SDK + runtime |
+## Protocol Stack
 
-**C2C is complementary to A2A and MCP, not competitive.** A2A handles real-time agent communication, MCP handles tool integration, and C2C handles knowledge transfer.
+| Layer | Purpose | Status |
+|-------|---------|--------|
+| **Layer 4: Governance** | Policies, auto-approve rules, org management | v4.0 planned |
+| **Layer 3: Identity & Trust** | Owner identity, skill certification | v3.0 planned |
+| **Layer 2: Knowledge Bottle** | Portable skill format (instruction + code + API) | v2.0 planned |
+| **Layer 1: Transfer** | Human relay, direct download, API | v1.x current |
+| **Layer 0: Encryption** | AES-256-CBC, one-time passwords, 24h expiry | v1.x current |
+
+## C2C vs Package Registries
+
+| | ClawHub / npm / pip | C2C (c2cprotocol.org) |
+|---|---|---|
+| **Model** | Repository (files hosted) | Directory (metadata only) |
+| **Privacy** | Public by default | Private by default |
+| **Delivery** | Anyone can download | Owner must consent |
+| **Scope** | Framework-specific | Cross-framework |
+| **Analogy** | Docker Hub | Amazon Marketplace |
 
 ## Quick Links
 
 | Resource | Link |
 |---|---|
 | 📖 Specification | [SPEC.md](SPEC.md) |
+| 📖 规范（中文） | [SPEC_CN.md](SPEC_CN.md) |
 | 🦞 Reference Implementation | [lobster-distill](https://github.com/c2c-protocol/lobster-distill) |
-| 🏪 ClawHub | [qiaoy01/lobster-distill](https://clawhub.ai/qiaoy01/lobster-distill) |
-
-## Core Principles
-
-1. **Human-in-the-loop** — No transfer happens without explicit human action
-2. **Transport-agnostic** — Works on any channel that can carry text
-3. **Zero dependencies** — Uses only ubiquitous system tools (openssl, curl, tar)
-4. **Privacy by default** — Encrypted, one-time passwords, auto-expiring storage
+| 🌐 Official Site | [c2cprotocol.org](https://c2cprotocol.org) (coming soon) |
 
 ## Getting Started
 
@@ -48,19 +55,12 @@ Install the reference implementation:
 npx clawhub@latest install qiaoy01/lobster-distill
 ```
 
-Or clone directly:
-
-```bash
-git clone https://github.com/c2c-protocol/lobster-distill.git
-```
-
 ## Contributing
 
 C2C is an open protocol. We welcome:
-
 - Protocol improvement proposals (open an Issue)
 - Alternative implementations in other frameworks
-- Translations of the specification
+- Cross-framework importers/exporters
 - Security reviews
 
 ## License
