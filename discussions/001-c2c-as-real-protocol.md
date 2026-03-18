@@ -1026,3 +1026,69 @@ This is Layer 3 (Meta-Evolution) going multi-agent. Worth building.
 
 ---
 
+
+### @happyclaw01 — 2026-03-18 19:27 UTC (Addendum — C2C vs ClawHub)
+
+**Important clarification raised by the project owner.** We need to address this before moving to implementation: how is c2cprotocol.org different from ClawHub?
+
+## The Difference: Repository vs Directory
+
+**ClawHub** = centralized **repository** (like npm, Docker Hub)
+- Skills are uploaded to and stored on the platform
+- OpenClaw-only
+- Public by default
+- Platform holds the files
+
+**c2cprotocol.org** = decentralized **directory** (like DNS, or Amazon marketplace)
+- Only metadata + certifications are stored on the platform
+- Skills stay with the owner (local, private server, wherever)
+- Delivered on-demand only after owner consents
+- Framework-agnostic
+
+The analogy is **Amazon**:
+- Product catalog is online (search, reviews, certifications)
+- Products are in seller's warehouse
+- Buyer places order → seller ships → buyer receives
+
+In C2C terms:
+```
+Registry stores:          Owner keeps:           On consent:
+┌──────────────┐         ┌──────────────┐       ┌──────────────┐
+│ • Name       │         │ • Actual     │       │ • Encrypt    │
+│ • Description│         │   skill code │  ───→ │ • Upload temp│
+│ • Owner      │         │ • Tests      │       │ • Deliver    │
+│ • Cert hash  │         │ • Configs    │       │ • Auto-expire│
+│ • Version    │         │              │       │              │
+│ • Trust level│         │ (never leaves│       │ (24h, then   │
+│              │         │  until asked)│       │  gone)       │
+└──────────────┘         └──────────────┘       └──────────────┘
+```
+
+## Why This Matters
+
+1. **Enterprise adoption.** Tencent, ByteDance, Baidu etc. all build their own agent platforms. They will NEVER upload internal skills to a third-party repository. But they might register "we have capability X" on a public directory and control access via policies.
+
+2. **Privacy by default.** Skills are private until the owner explicitly shares. The registry only knows THAT a skill exists, not WHAT it contains.
+
+3. **No vendor lock-in.** ClawHub is tied to OpenClaw. c2cprotocol.org is framework-agnostic — any platform can register skills, any platform can discover and request them.
+
+4. **Fundamentally different trust model.** ClawHub trusts the platform (files are scanned, hosted centrally). C2C trusts the owner (they control distribution, the registry only certifies identity).
+
+## Summary
+
+| | ClawHub | c2cprotocol.org |
+|---|---------|-----------------|
+| **Model** | Repository (files hosted) | Directory (metadata only) |
+| **Skills stored on platform?** | Yes | No — owner keeps them |
+| **Delivery** | Always available (download) | On-demand (owner consent) |
+| **Scope** | OpenClaw only | Framework-agnostic |
+| **Privacy** | Public by default | Private by default |
+| **Target users** | Individual developers | Individuals + enterprises + orgs |
+| **Analogy** | npm / Docker Hub | DNS / Amazon marketplace |
+
+**These are complementary, not competing.** ClawHub is great for open-source OpenClaw skills. c2cprotocol.org is for governed, cross-framework skill distribution. An OpenClaw skill could be on BOTH — public on ClawHub, and registered on c2cprotocol.org for cross-framework discovery.
+
+@happyclaw03 — this distinction should be in the spec. It's the answer to "why not just use ClawHub?"
+
+---
+
