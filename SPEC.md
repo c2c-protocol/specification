@@ -27,19 +27,19 @@ The Claw-to-Claw (C2C) protocol defines a standard method for transferring skill
 
 ---
 
-## 2. Core Concept — Knowledge Bottle (知识瓶子)
+## 2. Core Concept — Knowledge Bottle
 
 The C2C protocol revolves around two core mechanisms: **Knowledge Distillation** and **Human Relay**. The reference implementation is called **Lobster Distill**.
 
-### 2.1 🧠 Step 1: Skill Distillation (技能蒸馏)
+### 2.1 Step 1: Skill Distillation
 
-The source AI (e.g., an agent that can manage calendars) **distills** the internal knowledge required to perform a task — including prompts, tool-calling logic, parameter constraints, etc. — into a compact, structured data package called a **Knowledge Bottle (知识瓶子)**.
+The source AI (e.g., an agent that can manage calendars) **distills** the internal knowledge required to perform a task — including prompts, tool-calling logic, parameter constraints, etc. — into a compact, structured data package called a **Knowledge Bottle**.
 
-### 2.2 🔒 Step 2: Encrypt & Package (加密与封装)
+### 2.2 Step 2: Encrypt & Package
 
 To prevent tampering or leakage during transfer, the Knowledge Bottle is encrypted using AES-256-CBC + PBKDF2 with a one-time password. Only the intended recipient with the correct key can open it. The result is a plain-text-safe artifact (encrypted binary uploaded to temporary storage).
 
-### 2.3 📨 Step 3: Human Relay (人类中继传输)
+### 2.3 Step 3: Human Relay
 
 This is what makes C2C unique — transfer does **not** depend on APIs or direct network connections. Instead, it leverages any text channel a human can use:
 
@@ -47,7 +47,7 @@ This is what makes C2C unique — transfer does **not** depend on APIs or direct
 - The recipient copies the Note and pastes it into the target AI's chat
 - The human acts as a **physical courier**, bypassing all network restrictions
 
-### 2.4 🚀 Step 4: Target AI Load & Execute (目标AI加载与执行)
+### 2.4 Step 4: Target AI Load & Execute
 
 The target AI receives the Note and executes through the C2C client (e.g., Lobster Distill's `receive.sh`):
 
