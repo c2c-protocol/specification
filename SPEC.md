@@ -27,7 +27,54 @@ The Claw-to-Claw (C2C) protocol defines a standard method for transferring skill
 
 ---
 
-## 2. Terminology
+## 2. Core Concept — Knowledge Bottle
+
+The C2C protocol revolves around two core mechanisms: **Knowledge Distillation** and **Human Relay**. The reference implementation is called **Lobster Distill**.
+
+### 2.1 Step 1: Skill Distillation
+
+The source AI (e.g., an agent that can manage calendars) **distills** the internal knowledge required to perform a task — including prompts, tool-calling logic, parameter constraints, etc. — into a compact, structured data package called a **Knowledge Bottle**.
+
+### 2.2 Step 2: Encrypt & Package
+
+To prevent tampering or leakage during transfer, the Knowledge Bottle is encrypted using AES-256-CBC + PBKDF2 with a one-time password. Only the intended recipient with the correct key can open it. The result is a plain-text-safe artifact (encrypted binary uploaded to temporary storage).
+
+### 2.3 Step 3: Human Relay
+
+This is what makes C2C unique — transfer does **not** depend on APIs or direct network connections. Instead, it leverages any text channel a human can use:
+
+- Paste the Note into WeChat, Telegram, email, or any messenger
+- The recipient copies the Note and pastes it into the target AI's chat
+- The human acts as a **physical courier**, bypassing all network restrictions
+
+### 2.4 Step 4: Target AI Load & Execute
+
+The target AI receives the Note and executes through the C2C client (e.g., Lobster Distill's `receive.sh`):
+
+1. Download the encrypted Knowledge Bottle using the provided URL
+2. Decrypt using the one-time password
+3. Extract and parse the skill description and invocation methods
+4. Dynamically load the skill — the target AI **instantly gains the same capability** as the source AI
+
+```
+Source AI          Knowledge Bottle        Human Relay         Target AI
+   │                     │                      │                   │
+   │  1. Distill ──────→ │                      │                   │
+   │                     │  2. Encrypt ────→    │                   │
+   │                     │     Upload to temp   │                   │
+   │                     │  3. Generate Note ─→ │                   │
+   │                     │                      │ 4. Forward ─────→ │
+   │                     │                      │                   │ 5. Download
+   │                     │                      │                   │ 6. Decrypt
+   │                     │                      │                   │ 7. Install
+   │                     │                      │                   │ 8. Skill active ✅
+```
+
+> **Key insight**: The entire process is **text-based**. No network API or persistent connection is required between agents. All sensitive content is encrypted and auto-expires within 24 hours.
+
+---
+
+## 3. Terminology
 
 | Term | Definition |
 |---|---|
@@ -38,11 +85,12 @@ The Claw-to-Claw (C2C) protocol defines a standard method for transferring skill
 | **Relay** | The human who forwards the Note from sender to receiver |
 | **Package** | The encrypted archive containing the skill |
 | **Note** | The text message containing download instructions and credentials |
+| **Knowledge Bottle** | The distilled, encrypted package of an AI skill — the core transfer artifact in C2C |
 | **Temporary Storage** | A file hosting service used to store the encrypted package |
 
 ---
 
-## 3. Protocol Flow
+## 4. Protocol Flow
 
 ```
 Sender Agent         Human Relay          Receiver Agent
@@ -82,9 +130,9 @@ Sender Agent         Human Relay          Receiver Agent
 
 ---
 
-## 4. Package Format
+## 5. Package Format
 
-### 4.1 Skill Packaging
+### 5.1 Skill Packaging
 
 A skill MUST be packaged as one of:
 
@@ -98,7 +146,7 @@ For directory packaging:
 tar czf <name>.tar.gz -C <skill-directory> .
 ```
 
-### 4.2 Encryption
+### 5.2 Encryption
 
 All packages MUST be encrypted before upload.
 
@@ -119,7 +167,7 @@ Decryption command:
 openssl enc -aes-256-cbc -d -pbkdf2 -in <file>.enc -out <file> -k <password>
 ```
 
-### 4.3 Password Generation
+### 5.3 Password Generation
 
 Passwords MUST be:
 - At least 24 characters long
@@ -133,9 +181,9 @@ openssl rand -base64 24
 
 ---
 
-## 5. Temporary Storage
+## 6. Temporary Storage
 
-### 5.1 Requirements
+### 6.1 Requirements
 
 The temporary storage service MUST:
 - Accept file uploads via HTTP
@@ -143,23 +191,23 @@ The temporary storage service MUST:
 - Automatically delete files after a defined period
 - Not require authentication for download
 
-### 5.2 Recommended Services
+### 6.2 Recommended Services
 
 | Service | Max Size | Expiry | Upload Method |
 |---|---|---|---|
 | litterbox.catbox.moe | 1 GB | 24h | `multipart/form-data` |
 
-### 5.3 Expiry
+### 6.3 Expiry
 
 Files SHOULD have a maximum lifetime of **24 hours**. The Note MUST inform the receiver of the expiry window.
 
 ---
 
-## 6. Note Format
+## 7. Note Format
 
 The Note is the core transfer artifact. It MUST be plain text, readable by both humans and AI agents.
 
-### 6.1 Structure
+### 7.1 Structure
 
 A Note MUST contain two clearly separated sections:
 
@@ -183,7 +231,7 @@ A Note MUST contain two clearly separated sections:
 - Cleanup command (rm)
 ```
 
-### 6.2 Requirements
+### 7.2 Requirements
 
 - The Note MUST be self-contained (no external references needed except the download URL)
 - The Note MUST include the decryption password
@@ -191,7 +239,7 @@ A Note MUST contain two clearly separated sections:
 - The Note MUST use only standard shell commands available on all Unix-like systems
 - The human relay SHOULD be able to forward the entire Note without modification
 
-### 6.3 Section Markers
+### 7.3 Section Markers
 
 The two sections MUST be clearly delimited so that:
 - The human relay knows which part is for them (summary/instructions)
@@ -205,16 +253,16 @@ Recommended markers:
 
 ---
 
-## 7. Security Model
+## 8. Security Model
 
-### 7.1 Threat Model
+### 8.1 Threat Model
 
 C2C assumes:
 - The communication channel between agents is **untrusted** (any IM platform)
 - The temporary storage is **untrusted** (public file hosting)
 - The human relay is **trusted** (the admin controls what gets forwarded)
 
-### 7.2 Security Properties
+### 8.2 Security Properties
 
 | Property | Mechanism |
 |---|---|
@@ -224,7 +272,7 @@ C2C assumes:
 | **Authorization** | Human relay decides what to forward and to whom |
 | **Non-replayability** | One-time passwords; expired storage links |
 
-### 7.3 Human-in-the-Loop Guarantee
+### 8.3 Human-in-the-Loop Guarantee
 
 The protocol's security fundamentally relies on the human relay:
 
@@ -235,7 +283,7 @@ The protocol's security fundamentally relies on the human relay:
 
 This is a feature, not a limitation. It provides an irreducible layer of human oversight that cannot be bypassed by either agent.
 
-### 7.4 Shell Command Safety
+### 8.4 Shell Command Safety
 
 C2C implementations use shell commands that security scanners may flag:
 
@@ -248,15 +296,15 @@ C2C implementations use shell commands that security scanners may flag:
 
 ---
 
-## 8. Transport Requirements
+## 9. Transport Requirements
 
-### 8.1 Minimum Requirements
+### 9.1 Minimum Requirements
 
 A C2C-compatible transport channel MUST support:
 - Text messages of at least 2,000 characters
 - Copy-paste or message forwarding
 
-### 8.2 Compatible Transports
+### 9.2 Compatible Transports
 
 Any text-capable channel works:
 
@@ -274,9 +322,9 @@ Any text-capable channel works:
 
 ---
 
-## 9. Implementation Requirements
+## 10. Implementation Requirements
 
-### 9.1 Sender Requirements
+### 10.1 Sender Requirements
 
 A conforming sender MUST:
 1. Package the skill as `.tar.gz` (directory) or raw file (single file)
@@ -286,7 +334,7 @@ A conforming sender MUST:
 5. Generate a Note following the format in Section 6
 6. Present the Note to the human relay
 
-### 9.2 Receiver Requirements
+### 10.2 Receiver Requirements
 
 A conforming receiver MUST:
 1. Parse the Note to extract URL, password, and file type
@@ -295,7 +343,7 @@ A conforming receiver MUST:
 4. Extract/read the skill contents
 5. Clean up temporary files
 
-### 9.3 Dependencies
+### 10.3 Dependencies
 
 A conforming implementation MUST use only:
 - `openssl` (encryption/decryption)
@@ -307,7 +355,7 @@ No additional libraries, SDKs, or runtimes are required.
 
 ---
 
-## 10. Versioning
+## 11. Versioning
 
 This specification follows [Semantic Versioning](https://semver.org/):
 - **Major**: Breaking changes to the protocol
@@ -318,7 +366,7 @@ Current version: **1.0.0**
 
 ---
 
-## 11. References
+## 12. References
 
 - [Lobster Distill](https://github.com/c2c-protocol/lobster-distill) — Reference implementation for OpenClaw
 - [A2A Protocol](https://github.com/a2aproject/A2A) — Google's Agent-to-Agent communication protocol
